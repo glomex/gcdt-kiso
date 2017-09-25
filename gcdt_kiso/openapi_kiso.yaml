@@ -1,0 +1,89 @@
+swagger: '2.0'
+info:
+  title: kiso config
+  description: "Documentation of the config file format for `kiso` (a gcdt tool). Note: if you want to add to the documentation please edit the openapi_kiso.yaml file"
+  version: 0.0.1
+
+paths:
+  /test:
+    get:
+      responses:
+        "200":
+          description:  success
+
+definitions:
+  accounts:
+    description: 'The kiso config is organized into the following structure:'
+    type: array
+    items:
+      $ref: '#/definitions/account'
+  account:
+    type: object
+    description: 'represents all settings for a single account'
+    properties:
+      StackName:
+        type: string
+        description: 'name of your cloudformation stack'
+        example: team-dev-my-application-stack
+      RoleARN:
+        type: string
+        description: 'role to use for cloudformation deployment'
+        example: arn:aws:iam::<AccountID>:role/<CloudFormationRoleName>
+        $ref: '#/definitions/arn'
+      NotificationARNs:
+        description: 'configure SNS recipients for stack events'
+        $ref: '#/definitions/NotificationARNs'
+      artifactBucket:
+        description: 's3 bucket use to upload the cloudformation template to AWS'
+        $ref: '#/definitions/arn'
+      TemplateBody:
+        type: string
+        example: value3
+    required:
+    - StackName
+    additionalProperties: false
+  parameters:
+    type: object
+    description: 'AWS cloudformation parameters. Parameters in the config must match the parameters used in the template!'
+    additionalProperties: true
+  deployment:
+    type: object
+    description: 'Stack properties specific to the deployment phase.'
+    properties:
+      DisableStop:
+        type: boolean
+        description: 'disable the kiso stop & start mechanism for this stack.'
+        example: true
+    additionalProperties: false
+  defaults:
+    type: object
+    description: 'Default properties to finetune gcdt tool lifecycle (override at own risk).'
+    properties:
+      non_config_commands:
+        type: array
+        description: 'kiso commands that do not require a config file.'
+        default: ['list']
+        items:
+          type: string
+      validate:
+        type: boolean
+        description: 'use this if you need to switch off config validation.'
+        default: true
+    required:
+    - non_config_commands
+    - validate
+    additionalProperties: false
+  top:
+    type: object
+    properties:
+      kiso:
+        $ref: '#/definitions/account'
+  NotificationARNs:
+    type: array
+    items:
+      $ref: '#/definitions/arn'
+      example: arn:aws:sns:eu-west-1:123456789012:mytopic1
+  arn:
+    type: string
+    description: '`Amazon Resource Name <http://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html>`_'
+    pattern: "arn:aws:([a-zA-Z0-9-])+:([a-z]{2}-[a-z]+-\\d{1})?:(\\d{12})?:(.*)"

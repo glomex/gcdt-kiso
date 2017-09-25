@@ -1,0 +1,41 @@
+{
+  "accounts": [
+    {
+      "accountId": "689006802678",
+      "accountName": "7finity-videoinfra-stage",
+      "managementRole": "7f-managed/videoinfra-stage-TeamisFullaccess-JUSAI17JGMWY",
+      "stacks": {
+        "common": {
+          "dnsZones": [
+            "stage.mds.glomex.cloud"
+          ]
+        },
+        "credentials": {
+          "certificates": [
+            "multidomain.glomex.cloud",
+            "wildcard.sim-technik.de",
+            "wildcard.glomex.com",
+            "wildcard.mdp.glomex.cloud"
+          ]
+        },
+        "network": {
+          "eu-central-1": {
+            "cidr": "172.28.116.0/22"
+          },
+          "eu-west-1": {
+            "cidr": "172.29.116.0/22"
+          }
+        },
+        "lambdanet": {
+          "eu-central-1": {
+            "cidr": "172.28.120.0/22"
+          },
+          "eu-west-1": {
+            "cidr": "172.29.120.0/22"
+          }
+        }
+      },
+      "stage": "stage"
+    }
+  ]
+}
