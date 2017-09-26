@@ -19,7 +19,7 @@ from gcdt.gcdt_logging import logging_config
 from gcdt.gcdt_plugins import load_plugins
 from gcdt.gcdt_signals import check_hook_mechanism_is_intact, \
     check_register_present
-from gcdt.utils import get_context, check_gcdt_update, are_credentials_still_valid, \
+from gcdt.utils import get_context, are_credentials_still_valid, \
     get_env
 
 log = logging.getLogger(__name__)
@@ -149,8 +149,8 @@ def lifecycle(awsclient, env, tool, command, arguments):
         gcdt_signals.error.send((context, config))
         return 1
 
-    gcdt_signals.command_finalized.send((context, config))
-    log.debug('### command_finalized')
+    # gcdt_signals.command_finalized.send((context, config))
+    # log.debug('### command_finalized')
 
     # TODO reporting (in case you want to get a summary / output to the user)
 

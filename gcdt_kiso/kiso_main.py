@@ -16,6 +16,7 @@ from tempfile import NamedTemporaryFile
 from clint.textui import colored
 from pyspin.spin import Default, Spinner
 from gcdt import utils
+from gcdt import gcdt_signals
 from gcdt.gcdt_cmd_dispatcher import cmd
 from . import kiso_lifecycle
 
@@ -59,9 +60,16 @@ def deploy_cmd(account_id, region, override=True, **tooldata):
         if account['accountId'] == account_id:
             account_cfg = account
 
-    for stack in account_cfg['stacks']:
-        print(stack)
+    keyorder = ['s3', 'iam', 'network', 'lambdanet', 'common', 'credentials']
+    ordered_stacks = OrderedDict(sorted(account_cfg['stacks'].items(), key=lambda i:keyorder.index(i[0])))
+    for stack in ordered_stacks:
+        conf['stack'] = {'StackName': 'base-%s' % stack}
+        conf['account-config'] = account_cfg
+        print('===== stack %s =====' % stack)
         cloudformation = load_template('%s/cloudformation/cloudformation.py' % stack)
+        if gcdt_signals.check_register_present(cloudformation):
+            cloudformation.register()
+
         exit_code = deploy_stack(
             awsclient=awsclient,
             context=context,
@@ -69,8 +77,14 @@ def deploy_cmd(account_id, region, override=True, **tooldata):
             cloudformation=cloudformation,
             override_stack_policy=override
         )
+        if exit_code == 0:
+            gcdt_signals.command_finalized.send((context, conf))
 
-        print(exit_code)
+        if gcdt_signals.check_deregister_present(cloudformation):
+            cloudformation.deregister()
+            #log.debug('### command_finalized')
+
+        print(stack, exit_code)
 
     #return exit_code
 
